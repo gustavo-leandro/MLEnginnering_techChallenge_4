@@ -1,0 +1,29 @@
+# Dados
+yfinance==0.2.54
+pandas==2.2.3
+numpy==1.26.4
+
+# Modelo
+tensorflow==2.16.2
+scikit-learn==1.5.2
+
+# Experimentos
+mlflow==2.16.2
+
+# API
+fastapi==0.115.4
+uvicorn[standard]==0.32.0
+pydantic==2.9.2
+httpx==0.27.2
+
+# Monitoramento
+prometheus-client==0.21.0
+
+# Testes
+pytest==8.3.3
+pytest-asyncio==0.24.0
+
+# Utilitários
+matplotlib==3.9.2
+seaborn==0.13.2
+jupyter==1.1.1
