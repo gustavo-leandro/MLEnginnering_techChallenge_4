@@ -45,3 +45,12 @@ outputs/
 
 # macOS
 .DS_Store
+
+# Prometheus runtime (WAL, chunks, locks)
+data/wal/
+data/chunks_head/
+data/lock
+data/queries.active
+
+# Logs de inferencia (runtime)
+reports/predictions_log.jsonl
