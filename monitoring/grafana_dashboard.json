@@ -1,0 +1,309 @@
+{
+  "title": "VALE3 LSTM API",
+  "uid": "vale3-lstm",
+  "timezone": "browser",
+  "refresh": "15s",
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Requests por segundo",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "rate(http_requests_total[1m])",
+          "legendFormat": "{{method}} {{endpoint}} {{status_code}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 2,
+      "title": "Taxa de Erros (4xx/5xx)",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "rate(http_request_errors_total[1m])",
+          "legendFormat": "{{endpoint}}",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "color": {
+            "fixedColor": "red",
+            "mode": "fixed"
+          }
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 3,
+      "title": "Latencia p50 / p95 / p99 \u2014 /predict",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.50, rate(http_request_duration_seconds_bucket{endpoint=\"/predict\"}[2m]))",
+          "legendFormat": "p50",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(http_request_duration_seconds_bucket{endpoint=\"/predict\"}[2m]))",
+          "legendFormat": "p95",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(http_request_duration_seconds_bucket{endpoint=\"/predict\"}[2m]))",
+          "legendFormat": "p99",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 4,
+      "title": "CPU e Memoria do Processo",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 12,
+        "y": 7,
+        "w": 12,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "process_cpu_percent",
+          "legendFormat": "CPU %",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        },
+        {
+          "expr": "process_memory_bytes / 1024 / 1024",
+          "legendFormat": "Memoria (MB)",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 5,
+      "title": "Ultimo Preco Previsto (BRL)",
+      "type": "stat",
+      "gridPos": {
+        "x": 0,
+        "y": 14,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "expr": "model_last_prediction_brl",
+          "legendFormat": "Preco previsto",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyBRL"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 6,
+      "title": "Drift \u2014 MAE janela deslizante",
+      "type": "stat",
+      "gridPos": {
+        "x": 6,
+        "y": 14,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "expr": "model_drift_mae",
+          "legendFormat": "MAE",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyBRL"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "MAE"
+            },
+            "properties": [
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 1.5
+                    },
+                    {
+                      "color": "red",
+                      "value": 2.0
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-background"
+              }
+            ]
+          }
+        ]
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 7,
+      "title": "Drift \u2014 RMSE janela deslizante",
+      "type": "stat",
+      "gridPos": {
+        "x": 12,
+        "y": 14,
+        "w": 6,
+        "h": 5
+      },
+      "targets": [
+        {
+          "expr": "model_drift_rmse",
+          "legendFormat": "RMSE",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "currencyBRL"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    },
+    {
+      "id": 8,
+      "title": "Historico de Latencia \u2014 /predict",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 0,
+        "y": 19,
+        "w": 24,
+        "h": 7
+      },
+      "targets": [
+        {
+          "expr": "rate(http_request_duration_seconds_sum{endpoint=\"/predict\"}[1m]) / rate(http_request_duration_seconds_count{endpoint=\"/predict\"}[1m])",
+          "legendFormat": "Latencia media",
+          "datasource": {
+            "type": "prometheus",
+            "uid": "vale3-prometheus"
+          }
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        }
+      },
+      "datasource": {
+        "type": "prometheus",
+        "uid": "vale3-prometheus"
+      }
+    }
+  ]
+}

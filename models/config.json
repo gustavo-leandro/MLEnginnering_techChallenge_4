@@ -1,0 +1,17 @@
+{
+  "ticker": "VALE3.SA",
+  "look_back": 90,
+  "n_features": 1,
+  "features": [
+    "Close"
+  ],
+  "units": 128,
+  "dropout_rate": 0.2,
+  "learning_rate": 0.001,
+  "batch_size": 32,
+  "metrics": {
+    "mae": 0.6147,
+    "rmse": 0.7598,
+    "mape": 1.1331
+  }
+}
